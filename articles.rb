@@ -37,6 +37,17 @@ require_relative "db_initialize"
 
 db = SQLite3::Database.open("db_articles.db")
 
+#ID Methods from initialization file
+def find_user_id (db, user)
+  user_values = db.execute("SELECT id FROM user where name = ?", [user])
+  user_values[0][0]
+end
+
+def find_article_id (db, article)
+  article_values = db.execute("SELECT id FROM article where article_name = ?", [article])
+  article_values[0][0]
+end
+
 # Methods:
 #   ADD USER
 #     Input: name
@@ -57,7 +68,7 @@ def add_article(db, name, article_name, author_name, topic, url, stars, comments
   db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)",
     [article_name, author_name, topic, url])
   db.execute("INSERT INTO review (user_id, article_id, stars, comments) VALUES (?, ?, ?, ?)",
-    [find_user_id(db,name), find_article_id(db,article), stars, comments]) 
+    [find_user_id(db,name), find_article_id(db,article_name), stars, comments]) 
 end 
 
 #   DELETE ARTICLE
@@ -88,11 +99,21 @@ end
 
 # Driver Code
 
-article_data = db.execute("SELECT * FROM article")
-review_data = db. execute("SELECT * FROM review")
-
 # Test Adding user
-add_user(db, "Pavan")
+# add_user(db, "Pavan")
 
-p db.execute("SELECT * FROM user")
+# p db.execute("SELECT * FROM user")
+
+# Testing add article
+# add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", "Eliza Barclay",
+#    "Health", "http://www.vox.com/science-and-health/2016/11/22/13638374/buddhist-monk-mindfulness",
+#    4, "Great Article about training your mind!")
+
+# p db.execute("SELECT * FROM article")
+
+# p db.execute("SELECT * FROM review")
+# Testing delete article
+  delete_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict")
+
+  p db.execute("SELECT * FROM article")
 
