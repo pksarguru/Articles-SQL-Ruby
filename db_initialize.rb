@@ -12,7 +12,7 @@ create_table_user = <<-SQL
   CREATE TABLE IF NOT EXISTS user(
     id INTEGER PRIMARY KEY,
     name VARCHAR(255)
-  )
+  );
 SQL
 
 db.execute(create_table_user)
@@ -25,7 +25,7 @@ create_table_article = <<-SQL
     author_name VARCHAR(255),
     topic VARCHAR(255),
     url VARCHAR(255)
-  )
+  );
 SQL
 
 db.execute(create_table_article)
@@ -39,8 +39,8 @@ create_table_review = <<-SQL
     stars INT,
     comments VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (article_id) REFERENCES article(id),
-  )
+    FOREIGN KEY (article_id) REFERENCES article(id)
+  );
 SQL
 
 db.execute(create_table_review)
@@ -48,13 +48,10 @@ db.execute(create_table_review)
 # Functions to push values
 def create_values(db, name, article, author, topic, url, stars, comments)
   db.execute("INSERT INTO user (name) VALUES (?)", [name])
-  db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)"\
-    , [article, author, topic, url])
-  # db.execute("INSERT INTO review (user_id, "
+  db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)", [article, author, topic, url])
 end 
 
 3.times do 
-  create_values(db, Faker::Name.name, Faker::Book.title, Faker::Book.author, Faker::Book.genre,\
-  Faker::Internet.url, 3, Faker::Hipster.sentence(4, false, 4))
+  create_values(db, Faker::Name.name, Faker::Book.title, Faker::Book.author, Faker::Book.genre, Faker::Internet.url, 3, Faker::Hipster.sentence(4, false, 4))
 end
 
