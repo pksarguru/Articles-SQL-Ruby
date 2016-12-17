@@ -85,6 +85,11 @@ end
 #     Steps:
 #       run SQL command to change stars and comments for a given article for a given user
 #     Output: updated reviews database
+def change_review (db, name, article_name, stars, comments)
+  db.execute("UPDATE review SET stars=(?), comments=(?) WHERE article_id =(?) AND user_id = (?)",
+    [stars, comments, find_article_id(db, article_name), find_user_id(db, name)])
+end
+
 #   CHECK IF ARTICLE EXISTS IN DATABASE
 # 
 #   VIEW ALL ARTICLES
@@ -107,9 +112,9 @@ end
 # p db.execute("SELECT * FROM user")
 
 # Testing add article
-# add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", "Eliza Barclay",
-#    "Health", "http://www.vox.com/science-and-health/2016/11/22/13638374/buddhist-monk-mindfulness",
-#    4, "Great Article about training your mind!")
+add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", "Eliza Barclay",
+   "Health", "http://www.vox.com/science-and-health/2016/11/22/13638374/buddhist-monk-mindfulness",
+   4, "Great Article about training your mind!")
 
 # p db.execute("SELECT * FROM article")
 
@@ -120,4 +125,12 @@ end
   # p db.execute("SELECT * FROM article")
 
   # p db.execute("SELECT * FROM review")  
+
+# Testing change review
+
+  p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
+
+  change_review(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", 5, "Even better than I thought!")
+
+  p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
 
