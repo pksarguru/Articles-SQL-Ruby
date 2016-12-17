@@ -76,15 +76,17 @@ end
 #     Steps:
 #       run SQL command to delete article by name
 #     Output: article removed from database
-def delete_article(db, name, article_name)
-  db.execute("DELETE FROM article WHERE article_name=(?) and user_id = (?)",
-    [article_name, find_user_id(db, name)])
+def delete_article(db, name, article_name) #=> deletes review from user but does not delete article entirely
+  db.execute("DELETE FROM review WHERE article_id=(?) AND user_id = (?)",
+    [find_article_id(db, article_name), find_user_id(db, name)])
 end
 #   CHANGE REVIEW OF ARTICLE
 #     Input: name, article_name, stars, comments
 #     Steps:
 #       run SQL command to change stars and comments for a given article for a given user
 #     Output: updated reviews database
+#   CHECK IF ARTICLE EXISTS IN DATABASE
+# 
 #   VIEW ALL ARTICLES
 #     Input: name
 #     Steps:
@@ -113,7 +115,9 @@ end
 
 # p db.execute("SELECT * FROM review")
 # Testing delete article
-  delete_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict")
+  # delete_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict")
 
-  p db.execute("SELECT * FROM article")
+  # p db.execute("SELECT * FROM article")
+
+  # p db.execute("SELECT * FROM review")  
 
