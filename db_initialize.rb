@@ -49,9 +49,49 @@ db.execute(create_table_review)
 def create_values(db, name, article, author, topic, url, stars, comments)
   db.execute("INSERT INTO user (name) VALUES (?)", [name])
   db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)", [article, author, topic, url])
-end 
-
-3.times do 
-  create_values(db, Faker::Name.name, Faker::Book.title, Faker::Book.author, Faker::Book.genre, Faker::Internet.url, 3, Faker::Hipster.sentence(4, false, 4))
 end
+
+user_values = db.execute("SELECT * FROM user")
+# p user_values
+article_values = db.execute("SELECT * FROM article") 
+# p article_values
+
+user_id = []
+
+def find_user_id (user)
+  db = SQLite3::Database.new("db_articles.db")
+  user_values = db.execute("SELECT * FROM user")
+  user_id = 0
+
+  user_values.each do |user_array|
+    if user_array[1] == user
+      user_id = user_array[0]
+    end
+  end 
+  user_id
+end
+
+p find_user_id("Lincoln Dach")
+
+def find_article_id (article)
+  db = SQLite3::Database.new("db_articles.db")
+  article_values = db.execute("SELECT * FROM article")
+  article_id = 0
+
+  article_values.each do |article_array|
+    if article_array[1] == article
+      article_id = article_array[0]
+    end
+  end 
+  article_id
+end
+
+p find_article_id("That Hideous Strength")
+
+
+# 3.times do 
+#   create_values(db, Faker::Name.name, Faker::Book.title, Faker::Book.author, Faker::Book.genre, Faker::Internet.url, 3, Faker::Hipster.sentence(4, false, 4))
+# end
+
+
 
