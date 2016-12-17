@@ -37,9 +37,24 @@ create_table_review = <<-SQL
     user_id INT,
     article_id INT,
     stars INT,
-    comments VARCHAR(255)
-    
+    comments VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (article_id) REFERENCES article(id),
   )
 SQL
 
 db.execute(create_table_review)
+
+# Functions to push values
+def create_values(db, name, article, author, topic, url, stars, comments)
+  db.execute("INSERT INTO user (name) VALUES (?)", [name])
+  db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)"\
+    , [article, author, topic, url])
+  # db.execute("INSERT INTO review (user_id, "
+end 
+
+3.times do 
+  create_values(db, Faker::Name.name, Faker::Book.title, Faker::Book.author, Faker::Book.genre,\
+  Faker::Internet.url, 3, Faker::Hipster.sentence(4, false, 4))
+end
+
