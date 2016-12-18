@@ -53,7 +53,7 @@ def find_article_id_from_user_id (db, user_id)
   if article_id == []
     puts "Sorry nothing here yet"
   else
-    article_id[0][0]
+    article_id
   end
 end
 
@@ -65,8 +65,7 @@ end
 #     output: new user in database
 def check_user(db, name)
   name_check = db.execute("SELECT name FROM user WHERE name=(?)", [name])
-  name_check = name_check[0][0]
-  if name_check == name
+  if name_check[0] != nil
     true
   else
     false
@@ -124,8 +123,6 @@ def change_review (db, name, article_name, stars, comments)
   db.execute("UPDATE review SET stars=(?), comments=(?) WHERE article_id =(?) AND user_id = (?)",
     [stars, comments, find_article_id(db, article_name), find_user_id(db, name)])
 end
-
-#   CHECK IF ARTICLE EXISTS IN DATABASE
 # 
 #   VIEW ALL ARTICLES
 #     Input: name
@@ -135,13 +132,12 @@ end
 def get_article_array (db, user)
   user_id = find_user_id(db, user)
   article_id = find_article_id_from_user_id(db, user_id)
-
+  article_array = []
   if article_id != nil 
-      article_array = db.execute("SELECT article.article_name, article.author_name, article.topic, article.url, review.stars, review.comments 
-      FROM article 
-      INNER JOIN review
-      ON article.id = review.article_id
-      WHERE article.id = ?", [article_id])
+    article_id.each do |item|
+      item_array = db.execute("SELECT article.article_name, article.author_name, article.topic, article.url, review.stars, review.comments FROM article INNER JOIN review ON article.id = review.article_id WHERE article.id = ?", [item[0]])
+      article_array << item_array
+    end
   end
 
   # article_array = article_array[0]
@@ -149,18 +145,20 @@ def get_article_array (db, user)
 end
 
 def print_article(user, arr)
-  if arr != nil 
+  if !arr.empty? 
     print user + "'s Articles:"
     puts
-    arr.each do |article|
-      puts "--------------------"
+    arr.each do |article| 
+      article.each do |article_element|
+        puts "--------------------"
 
-      puts "Name: " + article[0]
-      puts "Author: " + article[1]
-      puts "Website: " + article[2]
-      puts "URL: " + article[3]
-      puts "Stars: " + article[4].to_s
-      puts "Comments: " + article[5]
+        puts "Name: " + article_element[0]
+        puts "Author: " + article_element[1]
+        puts "Website: " + article_element[2]
+        puts "URL: " + article_element[3]
+        puts "Stars: " + article_element[4].to_s
+        puts "Comments: " + article_element[5]
+      end
     end
   end
 end
@@ -256,6 +254,9 @@ until user_input == "4"
 
     puts "Thanks for all the input"
   elsif user_input == "2"
+
+    system "clear"
+
     puts
     print_article(user_name,get_article_array(db, user_name))
     puts
