@@ -39,13 +39,18 @@ db = SQLite3::Database.open("db_articles.db")
 
 #ID Methods from initialization file
 def find_user_id (db, user)
-  user_values = db.execute("SELECT id FROM user where name = ?", [user])
+  user_values = db.execute("SELECT id FROM user WHERE name = ?", [user])
   user_values[0][0]
 end
 
 def find_article_id (db, article)
-  article_values = db.execute("SELECT id FROM article where article_name = ?", [article])
+  article_values = db.execute("SELECT id FROM article WHERE article_name = ?", [article])
   article_values[0][0]
+end
+
+def find_article_id_from_user_id (db, user_id)
+  article_id = db.execute("SELECT article_id FROM review WHERE user_id = ?", [user_id])
+  article_id[0][0]
 end
 
 # Methods:
@@ -97,6 +102,36 @@ end
 #     Steps:
 #       Run SQL command to display all articles for given user
 #     Output: all article info for given user
+def get_article_array (db, user)
+  user_id = find_user_id(db, user)
+  article_id = find_article_id_from_user_id(db, user_id)
+
+  article_array = db.execute("SELECT article.article_name, article.author_name, article.topic, article.url, review.stars, review.comments 
+    FROM article 
+    INNER JOIN review
+    ON article.id = review.article_id
+    WHERE article.id = ?", [article_id])
+
+  # article_array = article_array[0]
+  article_array
+end
+
+def print_article(user, arr)
+  print user + "'s Articles:"
+  puts
+  arr.each do |article|
+    puts "--------------------"
+
+    puts "Name: " + article[0]
+    puts "Author: " + article[1]
+    puts "Website: " + article[2]
+    puts "URL: " + article[3]
+    puts "Stars: " + article[4].to_s
+    puts "Comments: " + article[5]
+  end
+end
+
+
 #   LAUNCHY
 #     Input: article URL
 #     Steps:
@@ -112,9 +147,9 @@ end
 # p db.execute("SELECT * FROM user")
 
 # Testing add article
-add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", "Eliza Barclay",
-   "Health", "http://www.vox.com/science-and-health/2016/11/22/13638374/buddhist-monk-mindfulness",
-   4, "Great Article about training your mind!")
+# add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", "Eliza Barclay",
+#    "Health", "http://www.vox.com/science-and-health/2016/11/22/13638374/buddhist-monk-mindfulness",
+#    4, "Great Article about training your mind!")
 
 # p db.execute("SELECT * FROM article")
 
@@ -128,9 +163,16 @@ add_article(db, "Pavan", "A Buddhist monk explains mindfulness for times of conf
 
 # Testing change review
 
-  p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
+  # p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
 
-  change_review(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", 5, "Even better than I thought!")
+  # change_review(db, "Pavan", "A Buddhist monk explains mindfulness for times of conflict", 5, "Even better than I thought!")
 
-  p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
+  # p db.execute("SELECT * FROM review WHERE article_id = ?", [find_article_id(db, "A Buddhist monk explains mindfulness for times of conflict")]) 
+
+# Testing printing article array
+
+article_array = get_article_array(db, "Pavan")
+# p article_array
+
+print_article("Pavan",article_array)
 
