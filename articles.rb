@@ -59,9 +59,21 @@ end
 #     Steps: 
 #       run SQL command to add new user
 #     output: new user in database
-def add_user(db, name)
-  db.execute("INSERT INTO user (name) VALUES (?)", [name])
+def check_user(db, name)
+  if db.execute("INSERT INTO user (name) VALUES (?)", [name]) != nil
+    true
+  else
+    false
+  end
 end
+
+def add_user(db, name)
+  if check_user(db,name)
+    db.execute("INSERT INTO user (name) VALUES (?)", [name])
+  end
+end
+
+
 
 #   ADD ARTICLE
 #     Input: name, article_name, author_name, topic, url, stars, comments
@@ -139,7 +151,8 @@ end
 #     Output: opened website in separate window
 
 
-# Driver Code
+# DRIVER CODE/TEST CODE
+# __________________________
 
 # Test Adding user
 # add_user(db, "Pavan")
@@ -171,8 +184,84 @@ end
 
 # Testing printing article array
 
-article_array = get_article_array(db, "Pavan")
-# p article_array
+# article_array = get_article_array(db, "Pavan")
+# # p article_array
 
-print_article("Pavan",article_array)
+# print_article("Pavan",article_array)
+
+# USER INTERFACE
+# __________________________
+
+puts "Welcome to Ruby-SQL Article storage service."
+puts "What's your name?"
+user_name = gets.chomp
+
+add_user(db, user_name)
+user_input = ""
+
+until user_input == "4"
+
+  puts "What would you like to do?"
+  puts "(Type the corresponding number)"
+  puts "-------------------------------"
+  puts "1. Add article"
+  puts "2. View stored articles"
+  puts "3. Delete article"
+  puts "4. Quit"
+
+  user_input = gets.chomp
+
+  puts "-------------------------------"
+  puts 
+
+  if user_input == "1"
+    puts "What's the name of the article you'd like to add?"
+    user_article_name = gets.chomp
+    puts "Who wrote the article?"
+    user_article_author = gets.chomp
+    puts "What website is it from?"
+    user_article_website = gets.chomp
+    puts "What's the URL?"
+    user_article_url = gets.chomp
+    puts "How many stars would you rate it (1-5)?"
+    user_stars = gets.chomp
+    puts "Do you have a short review or comment?"
+    user_comment = gets.chomp
+
+    add_article(db, user_name, user_article_name, user_article_author, user_article_website, user_article_url, user_stars, user_comment)
+
+    system "clear"
+
+    puts "Thanks for all the input"
+  elsif user_input == "2"
+    puts
+    print_article(user_name,get_article_array(db, user_name))
+    puts
+  elsif user_input == "3"
+    print_article(user_name,get_article_array(db, user_name))
+    puts
+    puts "Enter the name of the article you'd like to delete"
+    user_article_delete = gets.chomp
+
+    delete_article(db, user_name, user_article_delete)
+
+    system "clear"
+  elsif user_input == "4"
+    break
+  else 
+    puts "Please enter valid input"
+    user_input = gets.chomp
+  end  
+
+end
+
+puts "Thanks for using the Ruby-SQL storage service."
+
+
+
+
+
+
+
+
 
