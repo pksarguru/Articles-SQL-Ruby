@@ -50,7 +50,11 @@ end
 
 def find_article_id_from_user_id (db, user_id)
   article_id = db.execute("SELECT article_id FROM review WHERE user_id = ?", [user_id])
-  article_id[0][0]
+  if article_id == []
+    puts "Sorry nothing here yet"
+  else
+    article_id[0][0]
+  end
 end
 
 # Methods:
@@ -60,7 +64,9 @@ end
 #       run SQL command to add new user
 #     output: new user in database
 def check_user(db, name)
-  if db.execute("INSERT INTO user (name) VALUES (?)", [name]) != nil
+  name_check = db.execute("SELECT name FROM user WHERE name=(?)", [name])
+  name_check = name_check[0][0]
+  if name_check == name
     true
   else
     false
@@ -68,7 +74,7 @@ def check_user(db, name)
 end
 
 def add_user(db, name)
-  if check_user(db,name)
+  if !check_user(db,name)
     db.execute("INSERT INTO user (name) VALUES (?)", [name])
   end
 end
@@ -80,12 +86,24 @@ end
 #     Steps:
 #       run SQL command to add new article with attributes
 #     Output: new article in database
+def check_article(db, article_name)
+  article_check = db.execute("SELECT article_name FROM article WHERE article_name=(?)", [article_name])
+  p article_check
+  article_check = article_check[0]
+  if article_check == article_name
+    true
+  else
+    false
+  end
+end
 
 def add_article(db, name, article_name, author_name, topic, url, stars, comments)
-  db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)",
-    [article_name, author_name, topic, url])
-  db.execute("INSERT INTO review (user_id, article_id, stars, comments) VALUES (?, ?, ?, ?)",
-    [find_user_id(db,name), find_article_id(db,article_name), stars, comments]) 
+  if !check_article(db, article_name)
+    db.execute("INSERT INTO article (article_name, author_name, topic, url) VALUES (?, ?, ?, ?)",
+      [article_name, author_name, topic, url])
+    db.execute("INSERT INTO review (user_id, article_id, stars, comments) VALUES (?, ?, ?, ?)",
+      [find_user_id(db,name), find_article_id(db,article_name), stars, comments]) 
+  end
 end 
 
 #   DELETE ARTICLE
@@ -118,28 +136,32 @@ def get_article_array (db, user)
   user_id = find_user_id(db, user)
   article_id = find_article_id_from_user_id(db, user_id)
 
-  article_array = db.execute("SELECT article.article_name, article.author_name, article.topic, article.url, review.stars, review.comments 
-    FROM article 
-    INNER JOIN review
-    ON article.id = review.article_id
-    WHERE article.id = ?", [article_id])
+  if article_id != nil 
+      article_array = db.execute("SELECT article.article_name, article.author_name, article.topic, article.url, review.stars, review.comments 
+      FROM article 
+      INNER JOIN review
+      ON article.id = review.article_id
+      WHERE article.id = ?", [article_id])
+  end
 
   # article_array = article_array[0]
   article_array
 end
 
 def print_article(user, arr)
-  print user + "'s Articles:"
-  puts
-  arr.each do |article|
-    puts "--------------------"
+  if arr != nil 
+    print user + "'s Articles:"
+    puts
+    arr.each do |article|
+      puts "--------------------"
 
-    puts "Name: " + article[0]
-    puts "Author: " + article[1]
-    puts "Website: " + article[2]
-    puts "URL: " + article[3]
-    puts "Stars: " + article[4].to_s
-    puts "Comments: " + article[5]
+      puts "Name: " + article[0]
+      puts "Author: " + article[1]
+      puts "Website: " + article[2]
+      puts "URL: " + article[3]
+      puts "Stars: " + article[4].to_s
+      puts "Comments: " + article[5]
+    end
   end
 end
 
